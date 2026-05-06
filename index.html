@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Bebelușii noștri" />
   <meta name="theme-color" content="#fdf6f0" />
-  <title>Fetitele cochetele</title>
+  <title>👶👶 Bebelușii noștri</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -209,14 +209,15 @@
       background: none;
       border: 1px solid var(--blush);
       border-radius: 40px;
-      padding: 8px 22px;
+      padding: 5px 14px;
       font-family: 'Jost', sans-serif;
-      font-size: 0.8rem;
+      font-size: 0.68rem;
       color: var(--muted);
       cursor: pointer;
       letter-spacing: 0.06em;
       transition: all 0.2s;
       -webkit-tap-highlight-color: transparent;
+      opacity: 0.75;
     }
 
     .undo-btn:active { background: var(--blush); color: var(--deep); }
@@ -363,6 +364,23 @@
       border-top: 1px solid var(--blush);
     }
 
+    .download-btn {
+      width: 100%;
+      background: var(--deep);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .download-btn:active { background: var(--rose); }
+
     .clear-btn {
       width: 100%;
       background: none;
@@ -472,7 +490,7 @@
 
 <div class="main" id="main">
   <h1>
-    Fetitele iubitele 🌸
+    Bebelușii noștri 🌸
     <span>tracker de mișcări</span>
   </h1>
 
@@ -506,6 +524,7 @@
   </div>
   <div class="panel-body" id="panelBody"></div>
   <div class="panel-footer">
+    <button class="download-btn" onclick="downloadHistory()">⬇️ Descarcă istoricul (.txt)</button>
     <button class="clear-btn" onclick="clearAll()">🗑 Șterge tot istoricul</button>
   </div>
 </div>
@@ -520,18 +539,18 @@
 <script>
   const FUNNY_MSGS = [
     "Scuze, mami, mă-ntindeam și eu! 🌸",
-    "baaaaaaaaaaaau 😅",
-    "Ora de gimnasticaaaa! 🤸‍♀️",
+    "Una dă, cealaltă se ferește 😅",
+    "Noi nu dormim, noi repetăm gimnastica! 🤸‍♀️",
     "Loc, loc, că suntem două! 👯‍♀️",
-    "Asta am fost eu, nu ea! 🙃",
-    "cam inghesuiala, nu te mint! 😤",
-    "Bună siuaa! 👋👋",
-    "Testăm limitele burticii 💅",
-    "Bebeluselor, dans! 💃💃",
+    "Asta a fost eu, nu ea! — Ambele 🙃",
+    "Mami, e prea înghesuit aicea! 😤",
+    "Bună ziua, suntem noi! 👋👋",
+    "Testăm limitele… ale tale, mami 💅",
+    "Pauza de dans a început! 💃💃",
     "Nu ne certăm, promitem! 🤞 (poate)",
-    "titi me preguntoo! 🏠",
-    "Tati a zis sa ne duceti la Rio",
-    "cine-a pus burtica-n drum?! 🌟",
+    "Mami, avem o idee: mai mult spațiu! 🏠",
+    "Kick! (a zis una) Și eu! (a zis cealaltă)",
+    "Nu știm cine a dat, dar a fost grozav! 🌟",
   ];
 
   let msgTimeout = null;
@@ -724,6 +743,48 @@
         </div>
       `;
     }).join('');
+  }
+
+  function downloadHistory() {
+    const kicks = loadData();
+    if (!kicks.length) { alert('Nu există niciun kick înregistrat încă!'); return; }
+
+    const byDay = {};
+    kicks.forEach(ts => {
+      const key = getDateKey(ts);
+      if (!byDay[key]) byDay[key] = [];
+      byDay[key].push(ts);
+    });
+
+    const days = Object.keys(byDay).sort((a,b) => a.localeCompare(b));
+    const months = ['ian','feb','mar','apr','mai','iun','iul','aug','sep','oct','nov','dec'];
+
+    let lines = [];
+    lines.push('🌸 Istoricul mișcărilor bebelușilor 🌸');
+    lines.push('═'.repeat(36));
+    lines.push('');
+
+    days.forEach(day => {
+      const [y, m, d] = day.split('-');
+      const dateStr = `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+      const times = byDay[day];
+      lines.push(`📅 ${dateStr} — ${times.length} ${times.length === 1 ? 'lovitură' : 'lovituri'}`);
+      times.forEach(ts => {
+        lines.push(`   🦶 ${formatTime(ts)}`);
+      });
+      lines.push('');
+    });
+
+    lines.push('─'.repeat(36));
+    lines.push(`Total: ${kicks.length} mișcări înregistrate`);
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `miscari-bebelusi-${getTodayKey()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   let panelOpen = false;
