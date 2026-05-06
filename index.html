@@ -397,6 +397,162 @@
 
     .clear-btn:active { background: #fff0ee; }
 
+    /* MANUAL ADD MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(61,42,46,0.35);
+      backdrop-filter: blur(3px);
+      z-index: 500;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 24px 24px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 480px;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(.77,0,.18,1);
+      box-shadow: 0 -8px 40px rgba(125,78,87,0.15);
+    }
+
+    .modal-overlay.show .modal {
+      transform: translateY(0);
+    }
+
+    .modal h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--deep);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal-fields {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .modal-field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-field label {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .modal-field input {
+      border: 1.5px solid var(--blush);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-family: 'Jost', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      background: #fffbfa;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .modal-field input:focus { border-color: var(--rose); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-cancel {
+      flex: 1;
+      background: none;
+      border: 1.5px solid var(--blush);
+      border-radius: 12px;
+      padding: 12px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .modal-save {
+      flex: 2;
+      background: linear-gradient(135deg, var(--blush), var(--rose));
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      box-shadow: 0 4px 16px rgba(125,78,87,0.2);
+    }
+
+    .modal-save:active { opacity: 0.85; }
+    .modal-cancel:active { background: #fff0ee; }
+
+    .add-manual-btn {
+      width: 100%;
+      background: none;
+      border: 1.5px dashed var(--blush);
+      border-radius: 10px;
+      padding: 9px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      color: var(--rose);
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .add-manual-btn:active { background: #fff0ee; }
+
+    .day-active-intervals {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .interval-chip {
+      font-size: 0.7rem;
+      background: linear-gradient(135deg, #fde8e5, #f5c9c0);
+      color: var(--deep);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .interval-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
     /* Pop animation for kick count */
     @keyframes pop {
       0% { transform: scale(1); }
@@ -490,7 +646,7 @@
 
 <div class="main" id="main">
   <h1>
-    Iubitelele 🌸
+    Fetitele iubitele 🌸
     <span>tracker de mișcări</span>
   </h1>
 
@@ -524,8 +680,30 @@
   </div>
   <div class="panel-body" id="panelBody"></div>
   <div class="panel-footer">
+    <button class="add-manual-btn" onclick="openManualModal()">✏️ Adaugă manual</button>
     <button class="download-btn" onclick="downloadHistory()">⬇️ Descarcă istoricul (.txt)</button>
     <button class="clear-btn" onclick="clearAll()">🗑 Șterge tot istoricul</button>
+  </div>
+</div>
+
+<!-- Manual add modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <h3>✏️ Adaugă kick manual</h3>
+    <div class="modal-fields">
+      <div class="modal-field">
+        <label>Data</label>
+        <input type="date" id="manualDate" />
+      </div>
+      <div class="modal-field">
+        <label>Ora</label>
+        <input type="time" id="manualTime" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeManualModal()">Anulează</button>
+      <button class="modal-save" onclick="saveManualKick()">🌸 Salvează</button>
+    </div>
   </div>
 </div>
 
@@ -710,6 +888,41 @@
     renderPanel(kicks);
   }
 
+  // Returns top 2 most active 1-hour dynamic windows (sliding, based on actual recordings)
+  function getActiveIntervals(timestamps) {
+    if (timestamps.length < 2) return [];
+
+    const sorted = [...timestamps].sort((a, b) => a - b);
+    const ONE_HOUR = 60 * 60 * 1000;
+
+    // For each kick, count how many kicks fall within the next 1h window starting from it
+    let windows = sorted.map(start => {
+      const end = start + ONE_HOUR;
+      const count = sorted.filter(ts => ts >= start && ts < end).length;
+      return { start, end, count };
+    });
+
+    // Sort by count desc
+    windows.sort((a, b) => b.count - a.count);
+
+    // Pick top 2 non-overlapping windows
+    const result = [];
+    for (const w of windows) {
+      if (result.length >= 2) break;
+      // Check it doesn't overlap with already picked windows
+      const overlaps = result.some(r => w.start < r.end && w.end > r.start);
+      if (!overlaps) result.push(w);
+    }
+
+    return result.map(w => {
+      const fmt = ts => {
+        const d = new Date(ts);
+        return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      };
+      return { label: `${fmt(w.start)}–${fmt(w.end)}`, count: w.count };
+    });
+  }
+
   function renderPanel(kicks) {
     const body = document.getElementById('panelBody');
 
@@ -733,6 +946,12 @@
       const times = byDay[day];
       const timeChips = times.map(ts => `<span class="kick-time">${formatTime(ts)}</span>`).join('');
       const isToday = day === getTodayKey();
+      const intervals = getActiveIntervals(times);
+      const intervalHtml = intervals.length ? `
+        <div class="interval-label">🔥 Intervale active</div>
+        <div class="day-active-intervals">
+          ${intervals.map(iv => `<span class="interval-chip">${iv.label} <strong>(${iv.count})</strong></span>`).join('')}
+        </div>` : '';
       return `
         <div class="day-card">
           <div class="day-card-header">
@@ -740,6 +959,7 @@
             <span class="day-badge">🦶 ${times.length} ${times.length === 1 ? 'lovitură' : 'lovituri'}</span>
           </div>
           <div class="day-kicks">${timeChips}</div>
+          ${intervalHtml}
         </div>
       `;
     }).join('');
@@ -785,6 +1005,41 @@
     a.download = `miscari-bebelusi-${getTodayKey()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function openManualModal() {
+    // Default: today + current time
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('manualDate').value =
+      `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+    document.getElementById('manualTime').value =
+      `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  function closeManualModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeManualModal();
+  }
+
+  function saveManualKick() {
+    const dateVal = document.getElementById('manualDate').value;
+    const timeVal = document.getElementById('manualTime').value;
+    if (!dateVal || !timeVal) { alert('Te rog completează data și ora!'); return; }
+
+    const ts = new Date(`${dateVal}T${timeVal}:00`).getTime();
+    if (isNaN(ts)) { alert('Dată sau oră invalidă.'); return; }
+
+    const kicks = loadData();
+    kicks.push(ts);
+    kicks.sort((a,b) => a - b); // keep sorted
+    saveData(kicks);
+    updateUI(kicks);
+    closeManualModal();
   }
 
   let panelOpen = false;
